@@ -103,6 +103,13 @@ function addToList(c){
     $(listEl).attr("data-value",c.toUpperCase());
     $(".list-group").append(listEl);
 }
+// display the past search again when the list group item is clicked in search history
+function invokePastSearch(event){
+    var liEl=event.target;
+    if (event.target.matches("li")){
+        city=liEl.textContent.trim();
+        currentWeather(city);
+    }
 
 }
 
@@ -133,3 +140,5 @@ $("#search-button").on("click",displayWeather);
 $(document).on("click",invokePastSearch);
 $(window).on("load",loadlastCity);
 $("#clear-history").on("click",clearHistory);
+
+
