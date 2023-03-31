@@ -1,88 +1,50 @@
 <script>
-    let appId = '71f6779186cc32448b4c412eea65b982';
-let units = 'metric'; 
-let searchMethod; // q means searching as a string.
 
-function getSearchMethod(searchTerm) {
-    if(searchTerm.length === 5 && Number.parseInt(searchTerm) + '' === searchTerm)
-        searchMethod = 'zip';
-    else 
-        searchMethod = 'q';
+      //Now we need to determine the constant of one of the id functions. Because no html function can be used directly in JavaScript.
+var inputval = document.querySelector('#cityinput')
+var btn = document.querySelector('#add');
+var city = document.querySelector('#cityoutput')
+var descrip = document.querySelector('#description')
+var temp = document.querySelector('#temp')
+var wind = document.querySelector('#wind')
+
+ 
+apik = "3045dd712ffe6e702e3245525ac7fa38"
+
+//kelvin to celcious. 1 Kelvin is equal to -272.15 Celsius.
+
+function convertion(val){
+    return (val - 273).toFixed(2)
 }
+//Now we have to collect all the information with the help of fetch method
 
-function searchWeather(searchTerm) {
-    getSearchMethod(searchTerm);
-    fetch(`http://api.openweathermap.org/data/2.5/weather?${searchMethod}=${searchTerm}&APPID=${appId}&units=${units}`)
-        .then((result) => {
-            return result.json();
-        }).then((res) => {
-            init(res);
-    });
-}
+    btn.addEventListener('click', function(){
 
-function init(resultFromServer) {
-    switch (resultFromServer.weather[0].main) {
-        case 'Clear':
-            document.body.style.backgroundImage = "url('clearPicture.jpg')";
-            break;
-        
-        case 'Clouds':
-            document.body.style.backgroundImage = "url('cloudyPicture.jpg')";
-            break;
+//This is the api link from where all the information will be collected
 
-        case 'Rain':
-        case 'Drizzle':
-            document.body.style.backgroundImage = "url('rainPicture.jpg')";
-            break;
+        fetch('https://api.openweathermap.org/data/2.5/weather?q='+inputval.value+'&appid='+apik)
+        .then(res => res.json())
 
-        case 'Mist':
-            document.body.style.backgroundImage = "url('mistPicture.jpg')";
-            break;    
-        
-        case 'Thunderstorm':
-            document.body.style.backgroundImage = "url('stormPicture.jpg')";
-            break;
-        
-        case 'Snow':
-            document.body.style.backgroundImage = "url('snowPicture.jpg')";
-            break;
+         //.then(data => console.log(data))
 
-        default:
-            break;
-    }
+        .then(data => {
 
-    let weatherDescriptionHeader = document.getElementById('weatherDescriptionHeader');
-    let temperatureElement = document.getElementById('temperature');
-    let humidityElement = document.getElementById('humidity');
-    let windSpeedElement = document.getElementById('windSpeed');
-    let cityHeader = document.getElementById('cityHeader');
+//Now you need to collect the necessary information with the API link. Now I will collect that information and store it in different constants.
 
-    let weatherIcon = document.getElementById('documentIconImg');
-    weatherIcon.src = 'http://openweathermap.org/img/w/' + resultFromServer.weather[0].icon + '.png';
+            var nameval = data['name']
+            var descrip = data['weather']['0']['description']
+            var tempature = data['main']['temp']
+            var wndspd = data['wind']['speed']
+//Now with the help of innerHTML you have to make arrangements to display all the information in the webpage.
+            city.innerHTML=`Weather of <span>${nameval}<span>`
+            temp.innerHTML = `Temperature: <span>${ convertion(tempature)} C</span>`
+            description.innerHTML = `Sky Conditions: <span>${descrip}<span>`
+            wind.innerHTML = `Wind Speed: <span>${wndspd} km/h<span>`
 
-    let resultDescription = resultFromServer.weather[0].description;
-    weatherDescriptionHeader.innerText = resultDescription.charAt(0).toUpperCase() + resultDescription.slice(1);
-    temperatureElement.innerHTML = Math.floor(resultFromServer.main.temp) + '&#176;';
-    windSpeedElement.innerHTML = 'Wind Speed: ' + Math.floor(resultFromServer.wind.speed) + ' meter/s';
-    cityHeader.innerHTML = resultFromServer.name;
-    humidityElement.innerHTML = 'Humidity levels: ' + resultFromServer.main.humidity +  '%';
+        })
 
-    setPositionForWeatherInfo();
-}
-
-function setPositionForWeatherInfo() {
-    let weatherContainer = document.getElementById('weatherContainer');
-    let weatherContainerHeight = weatherContainer.clientHeight;
-    let weatherContainerWidth = weatherContainer.clientWidth;
-
-    weatherContainer.style.left = `calc(50% - ${weatherContainerWidth/2}px)`;
-    weatherContainer.style.top = `calc(50% - ${weatherContainerHeight/1.3}px)`;
-    weatherContainer.style.visibility = 'visible';
-}
-
-document.getElementById('searchBtn').addEventListener('click', () => {
-    let searchTerm = document.getElementById('searchInput').value;
-    if(searchTerm)
-        searchWeather(searchTerm);
-});
-</script>
+//Now the condition must be added that what if you do not input anything in the input box.
+        .catch(err => alert('You entered Wrong city name'))
+    })
+//If you click on the submit button without inputting anything in the input box or typing the wrong city name then the above text can be seen.
+    </script>
